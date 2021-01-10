@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Верхние 3 мета-тега *должны* быть указаны в первую очередь в head; любой другой контент в head должен быть указан *после* этих тегов -->
+    <title>Выпускная работа Календарева Александра</title>
+
+    <!-- Bootstrap -->
+<!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous"> -->
+    <link rel="stylesheet" href="/assets/vendors/iconfonts/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="/assets/vendors/iconfonts/ionicons/css/ionicons.css">
+    <link rel="stylesheet" href="/assets/vendors/iconfonts/typicons/src/font/typicons.css">
+    <link rel="stylesheet" href="/assets/vendors/iconfonts/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.base.css">
+    <link rel="stylesheet" href="/assets/vendors/css/vendor.bundle.addons.css">
+    <link rel="stylesheet" href="/assets/vendors/iconfonts/font-awesome/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="/assets/css/shared/style.css">
+    <link rel="stylesheet" href="/assets/css/test_css/style.css">
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="/assets/css/demo_1/style.css">
+    <!-- End Layout styles -->
+    <link rel="shortcut icon" href="/assets/images/favicon.png"/>
+
+    <link rel="stylesheet" href="https://www.bootstrapdash.com/demo/star-admin-pro/src/assets/vendors/jquery-file-upload/uploadfile.css
+">
+
+
+    <script src="../assets/js/jquery.js"></script>
+    <!-- <script src="../assets/js/shared/chart.js"></script> -->
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="//jqueryui.com/resources/demos/style.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+  <style>
+  #custom-handle {
+    width: 3em;
+    height: 1.6em;
+    top: 50%;
+    margin-top: -.8em;
+    text-align: center;
+    line-height: 1.6em;
+  }
+  </style>
+
+  </head>
+  <body>
+  <script type="text/javascript">
+  
+  $( function() {
+    var handle = $( "#custom-handle" );
+    $( "#slider" ).slider({
+      max: 1,
+      min: 0.2,
+      step: 0.05,
+      create: function() {
+        handle.text( $( this ).slider( "value" ) );
+      },
+      slide: function( event, ui ) {
+        // var prb = getElement ById("prb");
+        handle.text( ui.value );
+      }
+    });
+  } );
+
+    if (window.FormData === undefined) {
+      alert('В вашем браузере FormData не поддерживается')
+    }
+  	
+  var id = 0;
+  var gtimer;
+
+  function stop(){
+      clearTimeout(gtimer) 
+  }
+
+  function pull_status() {
+      gtimer = setTimeout(pull_status, 2000);
+      $.get('/img/' + id +'.out.png').done(function(data){
+        
+        console.log('pull ok');
+        $('#out').prop('src', '/img/'+ id +'.out.png');
+        clearTimeout(gtimer)
+        $.get('/img/' + id +'.out.json').done(function(data){
+          // console.log(data)
+          out = ''
+          for (it in data){
+            // console.log(data[it])
+            ob = data[it]
+            // console.log(out)
+
+            for (itt in  ob) {
+              out += itt + ': ['
+              // console.log('' itt)
+              for(iit in ob[itt]){
+                out += ob[itt][iit] + ','   
+              }
+              out = out.slice(0, -1) + ']<br>';
+            }
+          }
+          $('#result').html('Детекция завершена <br>' + out);
+
+        });
+
+        // $('#result').html();
+
+ 
+      }).fail( function(data) {
+        console.log('pull fail');
+      });
+
+    }
+
+
+    function send(){
+
+      var formData = new FormData();
+      formData.append('filename', $("#pic")[0].files[0]);
+      formData.append('prb', $( "#slider").slider( "value" ));
+   
+
+      $.ajax({
+        type: "POST",
+        url: '/upload',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: formData,
+        // dataType : '',
+        success: function(msg){
+          console.log(msg);
+          console.log(msg.id);
+          if (!msg.error ) {
+            // $("#js-file").hide();
+            if (msg.success == 'Ok'){
+                $('#result').html('картинка загружена, ждите 15-20 сек на обработку'); 
+            } else {
+                $('#result').html(msg.success);
+            }
+            $('#out').prop('src', '/img/'+ msg.id +'.png');
+            console.log('return id')
+            console.log(msg.id)
+            id = msg.id
+            pull_status();
+
+            // console.log(msg.text);
+          } else {
+            $('#result').html('Картинка испорчена');
+            // console.log(msg)
+          }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown){
+          // console.log(XMLHttpRequest);
+          console.log(textStatus);
+          console.log(errorThrown);
+          if (errorThrown == 'Request Entity Too Large') {
+              $('#result').html('Загружаемый файл слишком большой' );
+          }
+
+          if (errorThrown == 'Internal Server Error') {
+              $('#result').html('Ошибка сервера' );
+          }
+
+        }
+
+      });  		
+  	}
+
+  </script>
+    <div class="page-header">
+	  <h1>Детекция изображений</h1>
+	</div>
+
+    <!-- на jQuery (необходим для Bootstrap - х JavaScript плагины) -->
+     <!-- Include all compiled plugins (below), or include individual files as needed
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    -->
+
+	<div class="main-panel">
+	  <div class="content-wrapper">
+		  <div class="row">
+	        <div class="col-md-12">
+	        	<h3>загрузить изображение</h3>
+            <!-- <form enctype="multipart/form-data" > -->
+					     
+               <div class="col-md-4">
+                 <!--input type="file" class="form-control file-upload-info" id="pic" placeholder="исходное изображение"/ -->
+                 <div id="slider">
+                    <div id="custom-handle" class="ui-slider-handle"></div>
+                 </div>
+                 <input type="hidden" name="prb" id="prb">
+                 <button type="submit" class="btn btn-success mr-2" onclick="send()">Submit</button>
+                 <!-- input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Image" -->
+      <div class="ajax-file-upload" style="position: relative; overflow: hidden; cursor: default;" >Upload
+        <input type="file" id="pic"  style="position: absolute; cursor: pointer; top: 0px; width: 100%; height: 100%; left: 0px; z-index: 100; opacity: 0;">
+      </div>
+
+               </div>
+           </div>
+      </div>
+      <div class="row">
+	        <div class="col-md-12"><h3>Детекция картинки</h3></div>
+          <div id="result"></div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12 grid-margin stretch-card" >
+          <img id="out" width="">
+        </div>
+      </div>
+	  
+    </div>
+	</div>
+  </body>
+</html>
