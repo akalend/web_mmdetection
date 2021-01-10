@@ -48,5 +48,9 @@ Deep Learning School  graduftion project:  Web site detection images based on mm
 
 mmdetection устанавливается в соответствии с инструкцией по установке https://github.com/open-mmlab/mmdetection/
 
+## Больше о детекции
+
+Mask R-CNN: архитектура современной нейронной сети для сегментации объектов на изображениях https://habr.com/ru/post/421299/
 
 
+Внимательно читаем одну статью по liveness detection  https://habr.com/ru/post/527984/
