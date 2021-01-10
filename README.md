@@ -37,3 +37,16 @@ Deep Learning School  graduftion project:  Web site detection images based on mm
 
 Дело в том, что процесс детекции осуществляется отностительно долгое время и некоторые сервера обрывают соединения, по этому сделана такая асинхронность. Такая реализация - более надежна.
 
+## Требования
+
+Виртуальный хостинг с 1 CPU 4 Gb памяти
+
+Используемые пакеты:
+- pyramid
+- python-daemon
+- json
+
+mmdetection устанавливается в соответствии с инструкцией по установке https://github.com/open-mmlab/mmdetection/
+
+
+
